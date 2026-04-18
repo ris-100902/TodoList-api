@@ -1,5 +1,6 @@
 package com.example.todolistapi.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,6 +19,7 @@ public class Users {
 
     @NotNull(message="Email has to be unique & not null")
     @Email
+    @Column(unique=true)
     private String email;
 
     @NotNull(message="Password should be present")
@@ -54,5 +56,4 @@ public class Users {
     public void setPassword_hash(String password_hash) {
         this.password_hash = password_hash;
     }
-
 }
