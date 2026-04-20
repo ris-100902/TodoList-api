@@ -28,7 +28,7 @@ public class UsersController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Users inputUser) {
         String token = this.usersService.login(inputUser);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(token);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("{\"token\": "+ token +"}");
     }
 
     @PostMapping("/register")

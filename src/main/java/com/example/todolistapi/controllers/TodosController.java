@@ -2,11 +2,14 @@ package com.example.todolistapi.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.todolistapi.entity.Todos;
@@ -25,8 +28,11 @@ public class TodosController{
     }
 
     @GetMapping("/todos")
-    public Iterable<Todos> getAll() {
-        return this.todosRepository.findAll();
+    public Iterable<Todos> getAll(
+        @RequestParam(defaultValue= "0") Integer page,
+        @RequestParam(defaultValue = "2") Integer limit
+    ) {
+        return this.todosRepository.getSelected(limit, (page)*limit);
     }
 
     @GetMapping(path="/todos/{id}")
@@ -39,5 +45,21 @@ public class TodosController{
     public ResponseEntity<Todos> addTodo(@Valid @RequestBody Todos todo) {
         Todos newTodo = this.todosRepository.save(todo);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTodo);
+    }
+
+    @PutMapping("/todos/{id}")
+    public ResponseEntity<Todos> updateTodo(@Valid @RequestBody Todos todo, @PathVariable Integer id) {
+        Todos fetchedTodo = todosRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
+        fetchedTodo.setTitle(todo.getTitle());
+        fetchedTodo.setDescription(todo.getDescription());
+        todosRepository.save(fetchedTodo);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(fetchedTodo);
+    }
+
+    @DeleteMapping("/todos/{id}")
+    public ResponseEntity<Todos> deleteTodo(@PathVariable Integer id) {
+        Todos fetchedTodo = todosRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
+        todosRepository.deleteById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(fetchedTodo);
     }
 }
