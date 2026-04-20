@@ -1,5 +1,9 @@
 package com.example.todolistapi.controllers;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,11 +32,17 @@ public class TodosController{
     }
 
     @GetMapping("/todos")
-    public Iterable<Todos> getAll(
-        @RequestParam(defaultValue= "0") Integer page,
+    public Map<String,Object> getAll(
+        @RequestParam(defaultValue= "1") Integer page,
         @RequestParam(defaultValue = "2") Integer limit
     ) {
-        return this.todosRepository.getSelected(limit, (page)*limit);
+        List<Todos>arr = this.todosRepository.getSelected(limit, (page-1)*limit);
+        Map<String, Object>map = new HashMap<>();
+        map.put("data", arr);
+        map.put("page", page);
+        map.put("limit", limit);
+        map.put("total", arr.size());
+        return map;
     }
 
     @GetMapping(path="/todos/{id}")
